@@ -1,0 +1,261 @@
+title: Midterm_ShannonMunroe_Fall2026
+/**
+ * @author Shannon Munroe
+ * @date October 21st 2026
+ */
+
+pretty much all run cases are in the main driver already, just run the main driver
+
+abstract Person: base of all object classes
+	extends: false
+	interfaces: {}
+	non-static variables: 2
+		- name: 
+			type: String
+			description: person name
+		- phoneNumber: 
+			type: int
+			description: represents a phone number
+	
+	final variables: 1
+		- personID:
+			type: String
+			description: alphanumerical identifier
+	
+	static variables: 1
+		- personCount:
+			type: int
+			description: a count of how many times the constructor has fully initialized
+	
+	constructor: Person(String personID, String name, int phoneNumber)
+		initialization checks:
+								- personID string cannot be empty
+								- name string cannot be empty
+								- phoneNumber must be in the range of 0..999999999
+	
+	non-static methods:
+		- void displayBasicDetails():
+			formats the instance *name*, *personId*, and *phoneNumber*, into a vertical list
+	
+	static methods:
+		- int getPersonCount():
+			returns the personCount variable 
+	
+	abstract methods:
+		- getRoleDescription: String
+		
+	overrides toString()? yes
+		formats return similar to the default too string with the static variable personCount outside the {}
+
+
+Member: base of all object classes
+	extends: Person
+	interfaces: {}
+	non-static variables: 3
+		- age:
+			type: int
+			description: age of person in years
+		- membershipType: 
+			type: String
+			description: the specified type of membership
+		- outstandingFees: 
+			type: double
+			description: fee of membership
+	
+	final variables: 1
+		- memberNumber:
+			type: int
+			description: an id of the member
+	
+	static variables: 0
+	
+	constructor: Member(String personID, String name, int phoneNumber, int memberNumber, int age)
+		DOES NOT INITIALIZE outstandingFees, or membershipType
+		initialization checks:
+								- memberNumber int cannot be negative
+								- age int must be positive
+	
+	non-static methods:
+		- void registerMember(double outstandingFees)
+			check outstandingFees isn't negative:
+				TRUE -> initialize outstandingFees with variable, set membershipType as "undefined"
+				FALSE -> throw error
+		- void registerMember(double outstandingFees, String membershipType)
+			check outstandingFees isn't negative and membershipType not an empty string:
+				TRUE -> initialize outstandingFees and membershipType with respective variable
+				FALSE -> throw error
+		- String getRoleDescription():
+			returns "member"
+	
+	static methods: 0
+	
+	abstract methods: 0
+		
+	overrides toString()? inherits
+
+abstract LibraryStaff: base of library employees
+	extends: Person
+	interfaces: {}
+	non-static variables: 2
+		- department: 
+			type: String
+			description: the specified department of work
+		- monthlySalary: 
+			type: double
+			description: baseline of pay for employees each month
+	
+	final variables: 1
+		- staffId:
+			type: int
+			description: an id of the staff member
+	
+	static variables: 1
+		- staffCount:
+			type: int
+			description: a count of how many times the constructor has fully initialized
+	
+	constructor: LibraryStaff(String personID, String name, int phoneNumber, int staffId, String department, double monthlySalary)
+		initialization checks:
+								- staffId int cannot be negative
+								- department String cannot be empty
+								- monthlySalary double must be positive
+	
+	non-static methods: 2
+		- void displayStaffDetails()
+			formats the instance *name*, *staffId*, *department*, and *monthlySalary*, into a vertical list and prints it
+		- String getRoleDescription():
+			returns "library worker"
+	
+	static methods: 0
+	
+	abstract methods: 1
+		- calculateMonthlyCompensation: double
+		
+	overrides toString()? inherits
+	
+	
+Librarian: librarian
+	extends: LibraryStaff
+	interfaces: {Reservable, Reportable}
+	non-static variables: 1
+		- booksProcessed: 
+			type: String array
+			description: a list of books checked out through the reserve method
+	
+	final variables: 1
+		- dailyIssueLimit:
+			type: int
+			description: the limit of how big the booksProcessed array can be
+	
+	static variables: 0
+	
+	constructor: Librarian(String personID, String name, int phoneNumber, int staffId, String department, double monthlySalary, int dailyIssueLimit)
+		sets booksProcessed to an empty int array of 0;
+		initialization checks:
+								- dailyIssueLimit int cannot be negative
+	
+	non-static methods: 2
+		- double calculateMonthlyCompensation
+			return monthlySalary plus the processing fee of each book checked out
+		- void reserveBook(String bookId):
+			check if bookId empty string:
+				TRUE -> throw error
+			check if librarian checkout count is below their checkout limit
+				TRUE -> add the bookId to booksProcessed
+					creates temporary array to remember the previous booksProcessed list by, reinitializes booksProcessed 1 item longer, places all old values back in array, adds bookId to final index
+				FALSE -> display message saying the librarian cannot check out the book
+		- void generateReport()
+			prints out a formatted report detailing *name*, *staffId*, contents of *booksProcessed*, item count of *booksProcessed*, and the additional pay of that many books
+		- calculateLateFee(int daysOverdue)
+			check if daysOverdue is negative:
+				TRUE -> throw error
+				FALSE -> return daysOverdue multiplied by the default late fee of 1.00
+		- calculateLateFee(int daysOverdue, double dailyRate)
+			check if daysOverdue is negative:
+				TRUE -> throw error
+			check if dailyRate is negative:
+				TRUE -> throw error
+				FALSE -> return daysOverdue multiplied by the dailyRate
+	
+	static methods: 0
+	
+	abstract methods: 0
+		
+	overrides toString()? inherits
+
+
+SeniorLibrarian: librarian
+	extends: Librarian
+	interfaces: {}
+	non-static variables: 1
+		- seniorityAllowance: 
+			type: double
+			description: bonus to monthlySalary
+	
+	final variables: 1
+		- specialization:
+			type: String
+			description: the specific area
+	
+	static variables: 0
+	
+	constructor: SeniorLibrarian(String personID, String name, int phoneNumber, int staffId, String department, double monthlySalary, int dailyIssueLimit, String specialization, double seniorityAllowance)
+		initialization checks:
+								- specialization String cannot be empty
+								- seniorityAllowance double cannot be negative
+	
+	non-static methods: 2
+		- @Override double calculateMonthlyCompensation
+			return monthlySalary plus the processing fee of each book checked out plus the seniorityAllowance
+		- @Override void displayStaffDetails()
+			formats the instance *name*, *staffId*, *department*, *specialization*, and *monthlySalary* plus *seniorityAllowance*, into a vertical list and prints it
+	
+	static methods: 0
+	
+	abstract methods: 0
+		
+	overrides toString()? inherits
+	
+LibraryAssistant: librarian
+	extends: LibraryStadd
+	interfaces: {Reportable}
+	non-static variables: 1
+		- shiftAllowance: 
+			type: double
+			description: bonus to monthlySalary
+	
+	final variables: 1
+		- shiftType:
+			type: String
+			description: the shift archetype, i.e: morning, evening, night
+	
+	static variables: 0
+	
+	constructor: LibraryAssistant(String personID, String name, int phoneNumber, int staffId, String department, double monthlySalary, String shiftType, double shiftAllowance)
+		initialization checks:
+								- shiftType String cannot be empty
+								- shiftAllowance double cannot be negative
+	
+	non-static methods: 2
+		- double calculateMonthlyCompensation
+			return monthlySalary plus shiftAllowance
+		- void generateReport()
+			prints out a formatted report detailing *name*, *staffId*, and the monthly salary plus shift allowance
+		- @Override void displayStaffDetails()
+			formats the instance *name*, *staffId*, *department*, *shiftType*, and *monthlySalary* plus *shiftAllowance*, into a vertical list and prints it
+	
+	static methods: 0
+	
+	abstract methods: 0
+		
+	overrides toString()? inherits
+
+
+interface Reservable:
+	implemented by: {Librarian}
+	- void reserveBook(String bookId)
+
+interface Reportable:
+	implemented by: {Librarian, LibraryAssistant}
+	- void generateReport()
+
